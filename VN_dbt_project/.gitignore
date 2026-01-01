@@ -6,3 +6,7 @@ dbt_internal_packages/
 profiles.yml
 .env
 .env.*
+data/**/*.csv
+data/**/*.zip
+data/**/*.parquet
+data/**/*.json
