@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: fct_order_payment
+    description: >
+      Order payment fact table (one row per payment record for an order).
+      An order can have multiple payments, identified by payment_sequential.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - payment_sequential
+
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "payment_value >= 0"
+
+    columns:
+      - name: order_id
+        description: Foreign key to the order fact table.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_order')
+                field: order_id
+
+      - name: payment_sequential
+        description: Sequence number of the payment for the same order (used with order_id as the unique key).
+        data_tests:
+          - not_null
+
+      - name: payment_type
+        description: Payment method (e.g., credit_card, boleto, voucher, debit_card).
+
+      - name: payment_installments
+        description: Number of installments used for the payment (typically >= 0).
+
+      - name: payment_value
+        description: Monetary value of this payment record (non-negative).

@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: dim_seller
+    description: >
+        Seller dimension table (one row per seller). Contains seller identifiers and
+        attributes used to analyze sales by seller.
+    columns:
+      - name: seller_id
+        description: Unique identifier for a seller.
+        data_tests:
+          - not_null
+          - unique

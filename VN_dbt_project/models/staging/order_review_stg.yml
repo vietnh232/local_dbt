@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: order_review_stg
+    columns:
+      - name: review_id
+        data_tests: 
+          - not_null
+      - name: order_id
+        data_tests:
+          - relationships:
+              arguments: 
+                to: ref('order_stg')
+                field: order_id

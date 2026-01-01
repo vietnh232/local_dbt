@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: fct_customer
+    description: >
+      Customer-level fact table (one row per unique customer).
+      Contains customer purchase behavior metrics such as number of orders, first/last order dates,
+      and total spend. Used to segment customers (new vs returning) and analyze lifetime value.
+
+    tests:
+      # Customers in this mart should have at least 1 order.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "number_of_orders > 0"
+          config:
+            severity: error
+
+      # Total spend should be present for each customer record.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_spent_each_customer is not null"
+          config:
+            severity: error
+
+    columns:
+      - name: customer_unique_id
+        description: >
+          This is the primary key of this fact table.
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customer')
+                field: customer_unique_id
+
+      - name: number_of_orders
+        description: Total number of orders placed by the customer.
+
+      - name: first_order_date
+        description: Date when the customer placed their first order.
+
+      - name: last_order_date
+        description: Date when the customer placed their most recent order.
+
+      - name: total_spent_each_customer
+        description: Total lifetime spend aggregated across all orders for the customer.

@@ -1,0 +1,85 @@
+# Name your project! Project names should contain only lowercase characters
+# and underscores. A good package name should reflect your organization's
+# name or the intended use of these models
+name: 'VN_dbt_project'
+version: '1.0.0'
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'VN_dbt_project'
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+# In this example config, we tell dbt to build all models in the example/
+# directory as views. These settings can be overridden in the individual model
+# files using the `{{ config(...) }}` macro.
+seeds:
+  VN_dbt_project:
+    +schema: raw
+models:
+  VN_dbt_project:
+    # Config indicated by + and applies to all files under models/staging/
+    staging:
+      customer_stg:
+        +schema: processing
+        +materialized: view
+      order_stg:
+        +schema: processing
+        +materialized: view
+      order_item_stg:
+        +schema: processing
+        +materialized: view
+      order_payment_stg:
+        +schema: processing
+        +materialized: view
+      seller_stg:
+        +schema: processing
+        +materialized: view
+      product_stg:
+        +schema: processing
+        +materialized: view
+      order_review_stg:
+        +schema: processing
+        +materialized: view
+    mart:
+      fct_order:
+        +schema: consuming
+        +materialized: table
+      fct_order_item:
+        +schema: consuming
+        +materialized: table
+      fct_order_payment:
+        +schema: consuming
+        +materialized: table
+      fct_order_review:
+        +schema: consuming
+        +materialized: table
+      fct_customer:
+        +schema: consuming
+        +materialized: table
+      dim_seller:
+        +schema: consuming
+        +materialized: table
+      dim_product:    
+        +schema: consuming
+        +materialized: table 
+      dim_customer:    
+        +schema: consuming
+        +materialized: table 
+    
+    

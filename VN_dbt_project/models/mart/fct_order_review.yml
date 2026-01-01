@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: fct_order_review
+    description: >
+      Order review fact table (one row per review). Links customer feedback to orders.
+      Unique grain is typically (order_id, review_id).
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - review_id
+
+    columns:
+      - name: review_id
+        description: Unique identifier for a review record.
+        data_tests:
+          - not_null
+
+      - name: order_id
+        description: Foreign key to the order fact table that this review is associated with.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_order')
+                field: order_id
+
+      # Optional (keep only if these columns exist in your SQL):
+      - name: review_score
+        description: Customer rating score for the order (typically 1–5).
+
+      - name: review_creation_date
+        description: Timestamp when the review was created.
+
+      - name: review_answer_timestamp
+        description: Timestamp when the seller responded to the review (if any).

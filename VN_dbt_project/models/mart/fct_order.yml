@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: fct_order
+    description: Order-level fact table (one row per order)
+    tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "dq_delivered_missing_delivered_date is False"
+          config:
+            severity: "warn"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "time_purchased_to_delivered > 60"
+          config:
+            severity: "warn"
+    columns:
+      - name: order_id
+        description: Unique identifier for an order (one row per order in this fact table).
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments: 
+                to: ref('order_stg')
+                field: order_id
+      - name: order_status
+        description: >
+          Current lifecycle status of the order (e.g., created, shipped, delivered, canceled etc).
+          Used for filtering and lifecycle analysis.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['shipped', 'unavailable', 'invoiced', 'created', 'approved', 'processing', 'delivered', 'canceled']
+      - name: customer_id
+        description: Foreign key to the customer dimension for this order.
+        data_tests:
+          - relationships:
+              arguments: 
+                to: ref('dim_customer')
+                field: customer_id
+  

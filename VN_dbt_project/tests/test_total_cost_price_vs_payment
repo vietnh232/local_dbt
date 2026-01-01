@@ -1,0 +1,28 @@
+{{ config(
+    severity = 'warn',
+    warn_if = '!=0'  
+) }}
+
+with payment_item as
+(
+select 
+coalesce(i.order_id, p.order_id) as order_id, 
+i.total_order_cost, 
+p.total_payment_value_per_order
+from {{source('consuming', 'fct_order_item')}} i full join {{source('consuming', 'fct_order_payment')}} p
+    on i.order_id = p.order_id
+),
+payment_item_order as
+(
+select coalesce(pi.order_id, o.order_id) as order_id, 
+o.order_status, 
+total_order_cost, 
+total_payment_value_per_order, 
+pi.total_order_cost - pi.total_payment_value_per_order as cost_minus_payment
+from payment_item pi full join {{source('consuming', 'fct_order')}} o on pi.order_id = o.order_id
+)
+select distinct order_id, order_status, total_order_cost, total_payment_value_per_order, cost_minus_payment
+from payment_item_order 
+where total_order_cost is distinct from total_payment_value_per_order
+and order_status in ('delivered', 'shipped')
+and abs(cost_minus_payment) > 5 

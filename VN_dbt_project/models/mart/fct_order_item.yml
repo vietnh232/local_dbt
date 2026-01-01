@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: fct_order_item
+    description: >
+      Order item-level fact table (one row per item within an order).
+      Primary grain is (order_id, order_item_id).
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - order_item_id
+
+      # Basic sanity check: quantity must be positive and monetary amounts cannot be negative.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "(quantity > 0) and (price >= 0) and (freight_value >= 0)"
+
+    columns:
+      - name: order_id
+        description: Foreign key to the order fact table.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_order')
+                field: order_id
+
+      - name: order_item_id
+        description: Line item number within an order (together with order_id forms the unique grain).
+        data_tests:
+          - not_null
+
+      - name: product_id
+        description: Foreign key to the product dimension for the purchased item.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_product')
+                field: product_id
+
+      - name: seller_id
+        description: Foreign key to the seller dimension for the purchased item.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_seller')
+                field: seller_id
+
+      - name: quantity
+        description: Quantity of the item purchased (expected to be > 0).
+
+      - name: price
+        description: Item price (non-negative).
+
+      - name: freight_value
+        description: Shipping/freight value allocated to this item (non-negative).

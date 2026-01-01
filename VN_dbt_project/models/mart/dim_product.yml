@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: dim_product
+    description: >
+      Product dimension table (one row per product). Contains product identifiers and
+      attributes used to slice order item analytics.
+    columns:
+      - name: product_id
+        description: Unique identifier for a product.
+        data_tests:
+          - unique
+          - not_null
