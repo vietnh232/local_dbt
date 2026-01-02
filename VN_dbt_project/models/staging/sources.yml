@@ -14,22 +14,5 @@ sources:
       - name: geolocation
       - name: product_category_name_translation
 
-  - name: processing
-    schema: dbt_learning_processing
-    tables:
-      - name: customer_stg
-      - name: order_item_stg
-      - name: order_payment_stg
-      - name: order_review_stg
-      - name: order_stg
-      - name: product_stg
-      - name: seller_stg
-
-  - name: consuming
-    schema: dbt_learning_consuming
-    tables:
-      - name: fct_order
-      - name: fct_order_item
-      - name: fct_order_payment
       
     
